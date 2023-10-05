@@ -1,7 +1,5 @@
-import math
 from fractions import Fraction
 from functools import wraps
-from typing import Literal, Optional
 
 WRAPPED_FUNCS = [
     "add", "sub", "mul", "truediv", "floordiv", "mod", "divmod", "pow",
@@ -77,9 +75,9 @@ class PN:
         if self.is_integer and format in ("integer", "all"):
             outputs.append(f"{sign}{num}")
         if self.is_fraction and format in ("fraction", "all"):
-            outputs.append(f"{sign}\\frac{{{num}}}{{{den}}}")
+            outputs.append(fr"{sign}\frac{{{num}}}{{{den}}}")
         if self.is_improper and format in ("mixed", "all"):
-            outputs.append(f"{sign}{num // den or ""}\\frac{{{num % den}}}{{{den}}}")
+            outputs.append(fr"{sign}{num // den or ""}\frac{{{num % den}}}{{{den}}}")
 
         if not outputs:
             raise ValueError(f"invalid format {repr(format)} for {repr(self)}")

@@ -3,7 +3,7 @@ from typing import Annotated, Any, Dict, List, Optional, Tuple
 from pydantic import AfterValidator, BaseModel, TypeAdapter
 
 
-PREFIXES = ["var", "condition", "problem", "answer"]
+PREFIXES = ["var", "condition", "question", "answer"]
 
 def split_prefix(line: str) -> Optional[Tuple[str, str]]:
     line = line.strip()
@@ -45,7 +45,7 @@ if __name__ == "__main__":
             "@var a = 1",
             "@var b = 2",
             "@condition a < b",
-            "@problem a + b = ?",
+            "@question a + b = ?",
             "@answer 3",
         ],
     )

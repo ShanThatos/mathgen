@@ -29,13 +29,14 @@ class MathProblemGenerator:
     def _gen_condition(self, problem: MathProblem, line: str):
         problem.valid &= evaluate_expression(line.strip(), locals=problem.vars)
 
-    def _gen_problem(self, problem: MathProblem, line: str):
+    def _gen_question(self, problem: MathProblem, line: str):
         problem.question = eval("f\"$" + repr(line.strip())[1:-1] + "$\"", {}, problem.vars)
 
     def _gen_answer(self, problem: MathProblem, line: str):
         problem.answer = eval("f\"$" + repr(line.strip())[1:-1] + "$\"", {}, problem.vars)
 
 
+# poetry run python -m src.mathgen.gen.generate
 if __name__ == "__main__":
     model = MathProblemModel(
         id="1",
@@ -43,8 +44,8 @@ if __name__ == "__main__":
         gen=[
             "@var a = rand(3, 100) / rand(3, 10)",
             "@var b = rand(3, 100) / rand(3, 10)",
-            "@condition btwn(a, 1, 10) and btwn(b, 1, 10) and is_improper(a, b)",
-            "@problem {a:latex:mixed} \\times {b:latex:mixed}?",
+            "@condition 1 < a < 10 and 1 < b < 10 and is_improper(a, b)",
+            "@question {a:latex:mixed} \\times {b:latex:mixed}?",
             "@answer {a * b:latex}"
         ],
     )

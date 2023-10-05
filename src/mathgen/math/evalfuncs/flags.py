@@ -19,12 +19,3 @@ def _is_proper(*args: PN):
 @use_as_global("is_improper")
 def _is_improper(*args: PN):
     return all(x.is_improper for x in args)
-
-
-@use_as_global("btwn")
-def _btwn(x: PN, a: PN, b: PN):
-    return a < x < b
-
-@use_as_global("btwn_inclusive")
-def _btwn_inclusive(x: PN, a: PN, b: PN):
-    return a <= x <= b
