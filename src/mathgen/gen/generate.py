@@ -30,10 +30,10 @@ class MathProblemGenerator:
         problem.valid &= evaluate_expression(line.strip(), locals=problem.vars)
 
     def _gen_question(self, problem: MathProblem, line: str):
-        problem.question = eval("f\"$" + repr(line.strip())[1:-1] + "$\"", {}, problem.vars)
+        problem.question = eval(f"f'{repr(line.strip())[1:-1]}'", {}, problem.vars)
 
     def _gen_answer(self, problem: MathProblem, line: str):
-        problem.answer = eval("f\"$" + repr(line.strip())[1:-1] + "$\"", {}, problem.vars)
+        problem.answer = eval(f"f'{repr(line.strip())[1:-1]}'", {}, problem.vars)
 
 
 # poetry run python -m src.mathgen.gen.generate
