@@ -57,7 +57,7 @@ class MathProblemGenerator:
 # poetry run python -m src.mathgen.gen.generate
 if __name__ == "__main__":
     model = MathProblemModel(
-        id="1",
+        id=1,
         name="test",
         gen=[
             "@var a = rand(3, 100) / rand(3, 10)",
