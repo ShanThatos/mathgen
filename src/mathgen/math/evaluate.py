@@ -1,4 +1,6 @@
 import ast
+import random
+import threading
 
 from .evalfuncs.all import EVALFUNCS
 from .precise_num import PN
@@ -7,11 +9,16 @@ GIVEN_GLOBALS = {
     "PN": PN,
 } | EVALFUNCS
 
-def evaluate_expression(expr_str: str, globals={}, locals={}):
+RAND_SEED_LOCK = threading.Lock()
+def evaluate_expression(expr_str: str, globals={}, locals={}, seed=None):
+    global GIVEN_GLOBALS, RAND_SEED_LOCK
     globals = {**globals, **GIVEN_GLOBALS}
     expr = ast.parse(expr_str, mode="eval")
     expr = ast.fix_missing_locations(rewrite_constants().visit(expr))
-    return eval(ast.unparse(expr), globals, locals)
+    with RAND_SEED_LOCK:
+        random.seed(seed)
+        result = eval(ast.unparse(expr), globals, locals)
+    return result
 
 class rewrite_constants(ast.NodeTransformer):
     def visit_Constant(self, node: ast.Constant):

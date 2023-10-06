@@ -5,8 +5,9 @@ from .mathproblem import MathProblem, MathProblemModel, split_prefix
 class MathProblemGenerator:
     MAX_TRIES = 50
 
-    def __init__(self, model: MathProblemModel):
+    def __init__(self, model: MathProblemModel, seed=None):
         self.model = model
+        self.seed = seed
 
     def generate(self) -> MathProblem:
         for _ in range(self.MAX_TRIES):
@@ -24,10 +25,10 @@ class MathProblemGenerator:
     
     def _gen_var(self, problem: MathProblem, line: str):
         name, expr = line.split("=", 1)
-        problem.vars[name.strip()] = evaluate_expression(expr.strip(), locals=problem.vars)
+        problem.vars[name.strip()] = evaluate_expression(expr.strip(), locals=problem.vars, seed=self.seed)
 
     def _gen_condition(self, problem: MathProblem, line: str):
-        problem.valid &= evaluate_expression(line.strip(), locals=problem.vars)
+        problem.valid &= evaluate_expression(line.strip(), locals=problem.vars, seed=self.seed)
 
     def _gen_question(self, problem: MathProblem, line: str):
         problem.question = eval(f"f'{repr(line.strip())[1:-1]}'", {}, problem.vars)
