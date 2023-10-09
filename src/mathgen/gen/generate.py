@@ -73,3 +73,5 @@ if __name__ == "__main__":
     print(problem.vars)
     print(problem.question)
     print(problem.answer)
+
+    print(problem.model_dump_json())
