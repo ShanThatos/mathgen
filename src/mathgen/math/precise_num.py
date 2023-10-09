@@ -80,13 +80,8 @@ class PN:
     def is_improper(self):
         return self.is_fraction and not self.is_proper
 
-    def __format__(self, format_spec: str):
-        if format_spec.startswith("latex"):
-            latex_format = None
-            if ":" in format_spec:
-                latex_format = format_spec.split(":", 1)[1]
-            return self.as_latex(format=latex_format)  # type: ignore
-        return self._frac.__format__(format_spec)
+    def __format__(self, spec: str):
+        return self.as_latex(format=spec)  # type: ignore
 
     def as_latex(
         self,
@@ -94,7 +89,7 @@ class PN:
             Literal["integer", "fraction", "mixed", "decimal", "all"]
         ] = None,
     ):
-        if format is None:
+        if not format:
             format = (
                 "integer"
                 if self.is_integer

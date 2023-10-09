@@ -67,9 +67,9 @@ if __name__ == "__main__":
         gen=[
             "@var a = rand(3, 100) / rand(3, 10)",
             "@var b = rand(3, 100) / rand(3, 10)",
-            "@condition 1 < a < 10 and 1 < b < 10 and is_improper(a, b)",
-            "@question {a:latex:mixed} \\times {b:latex:mixed}?",
-            "@answer {a * b:latex}",
+            "@condition a < 10 and b < 10 and is_improper(a, b)",
+            "@question {a} \\times {b}?",
+            "@answer {a * b}",
         ],
     )
 
