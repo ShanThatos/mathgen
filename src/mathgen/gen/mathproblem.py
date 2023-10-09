@@ -8,6 +8,8 @@ from pydantic import (
     field_serializer,
 )
 
+from ..math.precise_num import PN
+
 PREFIXES = ["var", "condition", "question", "answer"]
 
 
@@ -36,7 +38,10 @@ class MathProblemModel(BaseModel):
 
 MathProblemModelAdapter = TypeAdapter(MathProblemModel)
 
-SerializableVar = Annotated[Any, PlainSerializer(lambda x: str(x), return_type=str)]
+SerializableVar = Annotated[
+    Any,
+    PlainSerializer(lambda x: str(x), return_type=str),
+]
 
 
 class MathProblem(BaseModel):

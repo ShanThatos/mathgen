@@ -1,5 +1,5 @@
 import threading
-from typing import List, Literal
+from typing import List
 
 from ..math.evaluate import evaluate_expression
 from .mathproblem import MathProblem, MathProblemModel, split_prefix

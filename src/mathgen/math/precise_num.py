@@ -118,7 +118,7 @@ class PN:
         return ",".join(distinct_outputs)
 
     def __str__(self):
-        return str(self._frac)
+        return self.as_latex()
 
     def __repr__(self):
         if self.den == 1:
