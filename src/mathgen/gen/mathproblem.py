@@ -1,6 +1,6 @@
 from typing import Annotated, Any, Dict, List, Optional, Tuple
 
-from pydantic import AfterValidator, BaseModel, TypeAdapter
+from pydantic import AfterValidator, BaseModel, PlainSerializer, TypeAdapter
 
 PREFIXES = ["var", "condition", "question", "answer"]
 
@@ -30,13 +30,15 @@ class MathProblemModel(BaseModel):
 
 MathProblemModelAdapter = TypeAdapter(MathProblemModel)
 
+SerializableVar = Annotated[Any, PlainSerializer(str)]
+
 
 class MathProblem(BaseModel):
-    name: str
+    model: MathProblemModel
     question: str = ""
     answer: str = ""
     valid: bool = True
-    vars: Dict[str, Any] = {}
+    vars: Dict[str, SerializableVar] = {}
 
 
 if __name__ == "__main__":
