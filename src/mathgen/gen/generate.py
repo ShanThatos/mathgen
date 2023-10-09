@@ -19,6 +19,8 @@ class MathProblemGenerator:
             problem = MathProblem(model=self.model)
             for line in self.model.gen.splitlines():
                 line = line.strip()
+                if not line:
+                    continue
                 prefix_line = split_prefix(line)
                 assert prefix_line is not None
                 prefix, line = prefix_line
