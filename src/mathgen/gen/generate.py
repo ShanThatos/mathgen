@@ -62,8 +62,8 @@ class MathProblemGenerator:
         problem.answer = eval(f"f{repr(line.strip())}", {}, problem.vars)
 
     @classmethod
-    def from_model(cls, model: MathProblemModel):
-        return cls(model.name, model.code)
+    def from_model(cls, model: MathProblemModel, *args, **kwargs):
+        return cls(model.name, model.code, *args, **kwargs)
 
 
 # poetry run python -m src.mathgen.gen.generate
