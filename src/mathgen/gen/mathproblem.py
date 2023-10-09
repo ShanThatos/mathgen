@@ -34,7 +34,7 @@ MathProblemModelAdapter = TypeAdapter(MathProblemModel)
 
 SerializableVar = Annotated[
     Any,
-    PlainSerializer(lambda x: str(x), return_type=str),
+    PlainSerializer(lambda x: repr(x), return_type=str),
 ]
 
 
@@ -42,5 +42,4 @@ class MathProblem(BaseModel):
     name: str = ""
     question: str = ""
     answer: str = ""
-    valid: bool = True
     vars: Dict[str, SerializableVar] = {}

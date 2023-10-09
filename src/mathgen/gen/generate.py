@@ -25,8 +25,7 @@ class MathProblemGenerator:
                 prefix_line = split_prefix(line)
                 assert prefix_line is not None
                 prefix, line = prefix_line
-                getattr(self, f"_gen_{prefix}")(problem, line)
-                if not problem.valid:
+                if getattr(self, f"_gen_{prefix}")(problem, line) == False:
                     break
             else:
                 return problem
@@ -52,7 +51,7 @@ class MathProblemGenerator:
         )
 
     def _gen_condition(self, problem: MathProblem, line: str):
-        problem.valid &= evaluate_expression(
+        return evaluate_expression(
             line.strip(), locals=problem.vars, seed=self.__current_seed
         )
 
