@@ -1,14 +1,6 @@
-from typing import Annotated, Any, Dict, List, Optional, Tuple
+from typing import Annotated, Any, Dict, Optional, Tuple
 
-from pydantic import (
-    AfterValidator,
-    BaseModel,
-    PlainSerializer,
-    TypeAdapter,
-    field_serializer,
-)
-
-from ..math.precise_num import PN
+from pydantic import AfterValidator, BaseModel, PlainSerializer, TypeAdapter
 
 PREFIXES = ["var", "condition", "question", "answer"]
 
@@ -21,19 +13,21 @@ def split_prefix(line: str) -> Optional[Tuple[str, str]]:
     return None
 
 
-def mathgen_line_validator(line: str) -> str:
-    if split_prefix(line) is None:
-        raise ValueError(f"invalid line, must start with one of {PREFIXES}")
-    return line
+def mathgen_validator(code: str) -> str:
+    lines = (x for x in code.splitlines() if x.strip())
+    for line in lines:
+        if split_prefix(line) is None:
+            raise ValueError(f"invalid line, must start with one of {PREFIXES}")
+    return "\n".join(lines)
 
 
-MathGenLine = Annotated[str, AfterValidator(mathgen_line_validator)]
+MathGen = Annotated[str, AfterValidator(mathgen_validator)]
 
 
 class MathProblemModel(BaseModel):
     id: int
     name: str
-    gen: List[MathGenLine]
+    gen: str
 
 
 MathProblemModelAdapter = TypeAdapter(MathProblemModel)
@@ -50,20 +44,3 @@ class MathProblem(BaseModel):
     answer: str = ""
     valid: bool = True
     vars: Dict[str, SerializableVar] = {}
-
-
-if __name__ == "__main__":
-    problem = MathProblemModel(
-        id=1,
-        name="test",
-        gen=[
-            "@var a = 1",
-            "@var b = 2",
-            "@condition a < b",
-            "@question a + b = ?",
-            "@answer 3",
-        ],
-    )
-    print(problem)
-
-    print(MathProblemModelAdapter.dump_json(problem))

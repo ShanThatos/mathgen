@@ -17,7 +17,8 @@ class MathProblemGenerator:
     def generate(self) -> MathProblem:
         for _ in range(self.MAX_TRIES):
             problem = MathProblem(model=self.model)
-            for line in self.model.gen:
+            for line in self.model.gen.splitlines():
+                line = line.strip()
                 prefix_line = split_prefix(line)
                 assert prefix_line is not None
                 prefix, line = prefix_line
@@ -64,13 +65,15 @@ if __name__ == "__main__":
     model = MathProblemModel(
         id=1,
         name="test",
-        gen=[
-            "@var a = rand(3, 100) / rand(3, 10)",
-            "@var b = rand(3, 100) / rand(3, 10)",
-            "@condition a < 10 and b < 10 and is_improper(a, b)",
-            "@question {a} \\times {b}?",
-            "@answer {a * b}",
-        ],
+        gen="\n".join(
+            [
+                "@var a = rand(3, 100) / rand(3, 10)",
+                "@var b = rand(3, 100) / rand(3, 10)",
+                "@condition a < 10 and b < 10 and is_improper(a, b)",
+                "@question {a} \\times {b}?",
+                "@answer {a * b}",
+            ]
+        ),
     )
 
     generator = MathProblemGenerator(model)
