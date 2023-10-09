@@ -13,9 +13,9 @@ class MathProblemGenerator:
         self.code = code
         self.seed = seed
         self.__current_seed = seed
-        self.__current_seed_lock = threading.Lock()
+        self.__generate_lock = threading.Lock()
 
-    def generate(self) -> MathProblem:
+    def _generate(self) -> MathProblem:
         for _ in range(self.MAX_TRIES):
             problem = MathProblem(name=self.name)
             for line in self.code.splitlines():
@@ -27,20 +27,25 @@ class MathProblemGenerator:
                 prefix, line = prefix_line
                 if getattr(self, f"_gen_{prefix}")(problem, line) == False:
                     break
+                self._step_current_seed()
             else:
                 return problem
         raise RuntimeError(f"Failed to generate a valid problem for {self.name}")
 
+    def generate(self) -> MathProblem:
+        with self.__generate_lock:
+            self.__current_seed = self.seed
+            problem = self._generate()
+            self.__current_seed = self.seed
+        return problem
+
     def generate_multiple(self, n: int) -> List[MathProblem]:
-        with self.__current_seed_lock:
+        with self.__generate_lock:
             self.__current_seed = self.seed
             problems: List[MathProblem] = []
             for _ in range(n):
-                problems.append(self.generate())
-                if isinstance(self.__current_seed, int):
-                    self.__current_seed = (
-                        self.__current_seed**2 * 3041 + self.__current_seed * 1009 + 1
-                    )
+                problems.append(self._generate())
+                self._step_current_seed()
             self.__current_seed = self.seed
         return problems
 
@@ -60,6 +65,12 @@ class MathProblemGenerator:
 
     def _gen_answer(self, problem: MathProblem, line: str):
         problem.answer = eval(f"f{repr(line.strip())}", {}, problem.vars)
+
+    def _step_current_seed(self):
+        if isinstance(self.__current_seed, int):
+            self.__current_seed = (
+                self.__current_seed**2 * 3041 + self.__current_seed * 1009
+            ) % 1000000007
 
     @classmethod
     def from_model(cls, model: MathProblemModel, *args, **kwargs):
@@ -82,10 +93,12 @@ if __name__ == "__main__":
         ),
     )
 
-    generator = MathProblemGenerator.from_model(model)
+    generator = MathProblemGenerator.from_model(model, seed=20)
     problem = generator.generate()
     print(problem.vars)
     print(problem.question)
     print(problem.answer)
 
     print(problem.model_dump_json())
+
+    print(generator.generate_multiple(5))
