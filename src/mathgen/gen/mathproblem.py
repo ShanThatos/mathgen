@@ -18,16 +18,16 @@ def mathgen_validator(code: str) -> str:
     for line in lines:
         if split_prefix(line) is None:
             raise ValueError(f"invalid line, must start with one of {PREFIXES}")
-    return "\n".join(lines)
+    return code
 
 
-MathGen = Annotated[str, AfterValidator(mathgen_validator)]
+MathGenCode = Annotated[str, AfterValidator(mathgen_validator)]
 
 
 class MathProblemModel(BaseModel):
     id: int
     name: str
-    gen: str
+    code: MathGenCode
 
 
 MathProblemModelAdapter = TypeAdapter(MathProblemModel)

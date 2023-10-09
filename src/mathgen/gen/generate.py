@@ -17,7 +17,7 @@ class MathProblemGenerator:
     def generate(self) -> MathProblem:
         for _ in range(self.MAX_TRIES):
             problem = MathProblem(model=self.model)
-            for line in self.model.gen.splitlines():
+            for line in self.model.code.splitlines():
                 line = line.strip()
                 if not line:
                     continue
@@ -67,7 +67,7 @@ if __name__ == "__main__":
     model = MathProblemModel(
         id=1,
         name="test",
-        gen="\n".join(
+        code="\n".join(
             [
                 "@var a = rand(3, 100) / rand(3, 10)",
                 "@var b = rand(3, 100) / rand(3, 10)",
