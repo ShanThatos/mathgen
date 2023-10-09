@@ -32,7 +32,7 @@ MathProblemModelAdapter = TypeAdapter(MathProblemModel)
 
 
 class MathProblem(BaseModel):
-    model: MathProblemModel
+    model_name: str
     question: str = ""
     answer: str = ""
     valid: bool = True

@@ -15,7 +15,7 @@ class MathProblemGenerator:
         if seed == "original":
             seed = self.seed
         for _ in range(self.MAX_TRIES):
-            problem = MathProblem(model=self.model)
+            problem = MathProblem(model_name=self.model.name)
             for line in self.model.gen:
                 prefix_line = split_prefix(line)
                 assert prefix_line is not None
