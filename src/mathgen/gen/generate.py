@@ -8,16 +8,17 @@ from .mathproblem import MathProblem, MathProblemModel, split_prefix
 class MathProblemGenerator:
     MAX_TRIES = 50
 
-    def __init__(self, model: MathProblemModel, seed=None):
-        self.model = model
+    def __init__(self, name: str, code: str, seed=None):
+        self.name = name
+        self.code = code
         self.seed = seed
         self.__current_seed = seed
         self.__current_seed_lock = threading.Lock()
 
     def generate(self) -> MathProblem:
         for _ in range(self.MAX_TRIES):
-            problem = MathProblem(model=self.model)
-            for line in self.model.code.splitlines():
+            problem = MathProblem(name=self.name)
+            for line in self.code.splitlines():
                 line = line.strip()
                 if not line:
                     continue
@@ -29,7 +30,7 @@ class MathProblemGenerator:
                     break
             else:
                 return problem
-        raise RuntimeError(f"failed to generate a valid problem for {self.model.name}")
+        raise RuntimeError(f"Failed to generate a valid problem for {self.name}")
 
     def generate_multiple(self, n: int) -> List[MathProblem]:
         with self.__current_seed_lock:
@@ -61,6 +62,10 @@ class MathProblemGenerator:
     def _gen_answer(self, problem: MathProblem, line: str):
         problem.answer = eval(f"f{repr(line.strip())}", {}, problem.vars)
 
+    @classmethod
+    def from_model(cls, model: MathProblemModel):
+        return cls(model.name, model.code)
+
 
 # poetry run python -m src.mathgen.gen.generate
 if __name__ == "__main__":
@@ -78,7 +83,7 @@ if __name__ == "__main__":
         ),
     )
 
-    generator = MathProblemGenerator(model)
+    generator = MathProblemGenerator.from_model(model)
     problem = generator.generate()
     print(problem.vars)
     print(problem.question)

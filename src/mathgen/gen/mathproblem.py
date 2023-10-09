@@ -39,7 +39,7 @@ SerializableVar = Annotated[
 
 
 class MathProblem(BaseModel):
-    model: MathProblemModel
+    name: str = ""
     question: str = ""
     answer: str = ""
     valid: bool = True
