@@ -2,13 +2,13 @@ import threading
 from typing import List
 
 from ..math.evaluate import evaluate_expression
-from .mathproblem import MathProblem, MathProblemModel, split_prefix
+from .mathproblem import MathGenCode, MathProblem, MathProblemModel, split_prefix
 
 
 class MathProblemGenerator:
     MAX_TRIES = 50
 
-    def __init__(self, name: str, code: str, seed=None):
+    def __init__(self, name: str, code: MathGenCode, seed=None):
         self.name = name
         self.code = code
         self.seed = seed
