@@ -8,29 +8,29 @@ from .mathproblem import MathGenCode, MathProblem, MathProblemModel, split_prefi
 class MathProblemGenerator:
     MAX_TRIES = 50
 
-    def __init__(self, name: str, code: MathGenCode, seed=None):
-        self.name = name
-        self.code = code
+    def __init__(self, model: MathProblemModel, seed=None):
+        self.model = model
         self.seed = seed
         self.__current_seed = seed
         self.__generate_lock = threading.Lock()
 
     def _generate(self) -> MathProblem:
         for _ in range(self.MAX_TRIES):
-            problem = MathProblem(name=self.name)
-            for line in self.code.splitlines():
+            self.vars = {}
+            self.problem = MathProblem(name=self.model.name, details=self.model.details)
+            for line in self.model.code.splitlines():
                 line = line.strip()
                 if not line:
                     continue
                 prefix_line = split_prefix(line)
                 assert prefix_line is not None
                 prefix, line = prefix_line
-                if getattr(self, f"_gen_{prefix}")(problem, line) == False:
+                if getattr(self, f"_gen_{prefix}")(line) == False:
                     break
                 self._step_current_seed()
             else:
-                return problem
-        raise RuntimeError(f"Failed to generate a valid problem for {self.name}")
+                return self.problem
+        raise RuntimeError(f"Failed to generate a valid problem for {self.model.name}")
 
     def generate(self) -> MathProblem:
         with self.__generate_lock:
@@ -49,22 +49,22 @@ class MathProblemGenerator:
             self.__current_seed = self.seed
         return problems
 
-    def _gen_var(self, problem: MathProblem, line: str):
+    def _gen_var(self, line: str):
         name, expr = line.split("=", 1)
-        problem.vars[name.strip()] = evaluate_expression(
-            expr.strip(), locals=problem.vars, seed=self.__current_seed
+        self.vars[name.strip()] = evaluate_expression(
+            expr.strip(), locals=self.vars, seed=self.__current_seed
         )
 
-    def _gen_condition(self, problem: MathProblem, line: str):
+    def _gen_condition(self, line: str):
         return evaluate_expression(
-            line.strip(), locals=problem.vars, seed=self.__current_seed
+            line.strip(), locals=self.vars, seed=self.__current_seed
         )
 
-    def _gen_question(self, problem: MathProblem, line: str):
-        problem.question = eval(f"f{repr(line.strip())}", {}, problem.vars)
+    def _gen_question(self, line: str):
+        self.problem.question = eval(f"f{repr(line.strip())}", {}, self.vars)
 
-    def _gen_answer(self, problem: MathProblem, line: str):
-        problem.answer = eval(f"f{repr(line.strip())}", {}, problem.vars)
+    def _gen_answer(self, line: str):
+        self.problem.answer = eval(f"f{repr(line.strip())}", {}, self.vars)
 
     def _step_current_seed(self):
         if isinstance(self.__current_seed, int):
@@ -73,14 +73,15 @@ class MathProblemGenerator:
             ) % 1000000007
 
     @classmethod
-    def from_model(cls, model: MathProblemModel, *args, **kwargs):
-        return cls(model.name, model.code, *args, **kwargs)
+    def from_code(cls, code: MathGenCode, *args, **kwargs):
+        return cls(
+            MathProblemModel(name="generated_from_code", code=code), *args, **kwargs
+        )
 
 
 # poetry run python -m src.mathgen.gen.generate
 if __name__ == "__main__":
     model = MathProblemModel(
-        id=1,
         name="test",
         code="\n".join(
             [
@@ -93,12 +94,11 @@ if __name__ == "__main__":
         ),
     )
 
-    generator = MathProblemGenerator.from_model(model, seed=20)
+    generator = MathProblemGenerator(model, seed=20)
     problem = generator.generate()
-    print(problem.vars)
     print(problem.question)
     print(problem.answer)
 
     print(problem.model_dump_json())
 
-    print(generator.generate_multiple(5))
+    # print(generator.generate_multiple(5))

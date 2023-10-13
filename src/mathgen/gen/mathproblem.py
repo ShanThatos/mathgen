@@ -1,6 +1,6 @@
-from typing import Annotated, Any, Dict, Optional, Tuple
+from typing import Annotated, Any, Dict, Literal, Optional, Tuple
 
-from pydantic import AfterValidator, BaseModel, PlainSerializer, TypeAdapter
+from pydantic import AfterValidator, BaseModel, Field, PlainSerializer, TypeAdapter
 
 PREFIXES = ["var", "condition", "question", "answer"]
 
@@ -24,22 +24,28 @@ def mathgen_validator(code: str) -> str:
 MathGenCode = Annotated[str, AfterValidator(mathgen_validator)]
 
 
+class MathProblemDetails(BaseModel):
+    display: Literal["number", "decimal", "money", "fraction", "mixed"] = "number"
+    ltr: bool = True
+    units: str = ""
+
+
 class MathProblemModel(BaseModel):
-    id: int
     name: str
     code: MathGenCode
+    title: str = ""
+    locked: bool = True
+    format: str = ""
+    difficulty: int = 0
+    explanation: str = ""
+    details: MathProblemDetails = Field(default_factory=MathProblemDetails)
 
 
 MathProblemModelAdapter = TypeAdapter(MathProblemModel)
 
-SerializableVar = Annotated[
-    Any,
-    PlainSerializer(lambda x: repr(x), return_type=str),
-]
-
 
 class MathProblem(BaseModel):
-    name: str = ""
+    name: str
     question: str = ""
     answer: str = ""
-    vars: Dict[str, SerializableVar] = {}
+    details: MathProblemDetails
