@@ -17,7 +17,7 @@ class MathProblemGenerator:
     def _generate(self) -> MathProblem:
         for _ in range(self.MAX_TRIES):
             self.vars = {}
-            self.problem = MathProblem(name=self.model.name, details=self.model.details)
+            self.problem = MathProblem(id=self.model.id)
             for line in self.model.code.splitlines():
                 line = line.strip()
                 if not line:
@@ -30,7 +30,7 @@ class MathProblemGenerator:
                 self._step_current_seed()
             else:
                 return self.problem
-        raise RuntimeError(f"Failed to generate a valid problem for {self.model.name}")
+        raise RuntimeError(f"Failed to generate a valid problem for {self.model.id}")
 
     def generate(self) -> MathProblem:
         with self.__generate_lock:
@@ -75,14 +75,14 @@ class MathProblemGenerator:
     @classmethod
     def from_code(cls, code: MathGenCode, *args, **kwargs):
         return cls(
-            MathProblemModel(name="generated_from_code", code=code), *args, **kwargs
+            MathProblemModel(id="generated_from_code", code=code), *args, **kwargs
         )
 
 
 # poetry run python -m src.mathgen.gen.generate
 if __name__ == "__main__":
     model = MathProblemModel(
-        name="test",
+        id="test",
         code="\n".join(
             [
                 "@var a = rand(3, 100) / rand(3, 10)",

@@ -24,28 +24,15 @@ def mathgen_validator(code: str) -> str:
 MathGenCode = Annotated[str, AfterValidator(mathgen_validator)]
 
 
-class MathProblemDetails(BaseModel):
-    display: Literal["number", "decimal", "money", "fraction", "mixed"] = "number"
-    ltr: bool = True
-    units: str = ""
-
-
 class MathProblemModel(BaseModel):
-    name: str
+    id: str
     code: MathGenCode
-    title: str = ""
-    locked: bool = True
-    format: str = ""
-    difficulty: int = 0
-    explanation: str = ""
-    details: MathProblemDetails = Field(default_factory=MathProblemDetails)
 
 
 MathProblemModelAdapter = TypeAdapter(MathProblemModel)
 
 
 class MathProblem(BaseModel):
-    name: str
+    id: str
     question: str = ""
     answer: str = ""
-    details: MathProblemDetails
