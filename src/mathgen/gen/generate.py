@@ -67,10 +67,10 @@ class MathProblemGenerator:
         )
 
     def _gen_question(self, line: str):
-        self.questions.add(eval(f"f{repr(line.strip())}", {}, self.vars))
+        self.questions.add(eval(f"f{repr("$" + line.strip() + "$")}", {}, self.vars))
 
     def _gen_answer(self, line: str):
-        self.problem.answer = eval(f"f{repr(line.strip())}", {}, self.vars)
+        self.problem.answer = eval(f"f{repr("$" + line.strip() + "$")}", {}, self.vars)
 
     def _step_current_seed(self):
         if isinstance(self.__current_seed, int):
