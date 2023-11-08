@@ -1,5 +1,6 @@
+import random
 import threading
-from typing import List
+from typing import Dict, List
 
 from ..math.evaluate import evaluate_expression
 from .mathproblem import MathGenCode, MathProblem, MathProblemModel, split_prefix
@@ -17,6 +18,7 @@ class MathProblemGenerator:
     def _generate(self) -> MathProblem:
         for _ in range(self.MAX_TRIES):
             self.vars = {}
+            self.questions = set()
             self.problem = MathProblem(id=self.model.id)
             for line in self.model.code.splitlines():
                 line = line.strip()
@@ -29,6 +31,8 @@ class MathProblemGenerator:
                     break
                 self._step_current_seed()
             else:
+                random.seed(self.__current_seed)
+                self.problem.question = random.choice(list(self.questions))
                 return self.problem
         raise RuntimeError(f"Failed to generate a valid problem for {self.model.id}")
 
@@ -42,9 +46,11 @@ class MathProblemGenerator:
     def generate_multiple(self, n: int) -> List[MathProblem]:
         with self.__generate_lock:
             self.__current_seed = self.seed
+            self.vars_list = []
             problems: List[MathProblem] = []
             for _ in range(n):
                 problems.append(self._generate())
+                self.vars_list.append(self.vars.copy())
                 self._step_current_seed()
             self.__current_seed = self.seed
         return problems
@@ -61,7 +67,7 @@ class MathProblemGenerator:
         )
 
     def _gen_question(self, line: str):
-        self.problem.question = eval(f"f{repr(line.strip())}", {}, self.vars)
+        self.questions.add(eval(f"f{repr(line.strip())}", {}, self.vars))
 
     def _gen_answer(self, line: str):
         self.problem.answer = eval(f"f{repr(line.strip())}", {}, self.vars)
