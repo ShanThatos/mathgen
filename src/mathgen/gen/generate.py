@@ -39,7 +39,7 @@ class MathProblemGenerator:
         for _ in range(self.MAX_TRIES):
             self.vars = {}
             self.questions = set()
-            self.problem = MathProblem(id=self.model.id, format=self.model.format, units=self.model.units)
+            self.problem = MathProblem(id=self.model.id, format=self.model.format)
             for line in self.model.code.splitlines():
                 line = line.strip()
                 if not line:
