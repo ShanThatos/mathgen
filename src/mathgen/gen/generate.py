@@ -31,8 +31,8 @@ class MathProblemGenerator:
                     break
                 self._step_current_seed()
             else:
-                random.seed(self.__current_seed)
-                self.problem.question = random.choice(list(self.questions))
+                if self.questions:
+                    self.problem.question = random.Random(self.__current_seed).choice(list(self.questions))
                 return self.problem
         raise RuntimeError(f"Failed to generate a valid problem for {self.model.id}")
 
