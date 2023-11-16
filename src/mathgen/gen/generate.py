@@ -39,7 +39,7 @@ class MathProblemGenerator:
         for _ in range(self.MAX_TRIES):
             self.vars = {}
             self.questions = set()
-            self.problem = MathProblem(id=self.model.id, format=self.model.format)
+            self.problem = MathProblem(id=self.model.id, format=self.model.format, units=self.model.units, rtl=self.model.rtl)
             for line in self.model.code.splitlines():
                 line = line.strip()
                 if not line:
@@ -113,12 +113,6 @@ class MathProblemGenerator:
             self.__current_seed = (
                 self.__current_seed**2 * 3041 + self.__current_seed * 1009
             ) % 1000000007
-
-    @classmethod
-    def from_code(cls, code: MathGenCode, format: MathProblemFormat="auto", *args, **kwargs):
-        return cls(
-            MathProblemModel(id="generated_from_code", code=code, format=format), *args, **kwargs
-        )
 
 
 # poetry run python -m src.mathgen.gen.generate

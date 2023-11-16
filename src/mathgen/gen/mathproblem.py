@@ -1,6 +1,6 @@
-from typing import Annotated, Any, Dict, Literal, Optional, Tuple
+from typing import Annotated, Literal, Optional, Tuple
 
-from pydantic import AfterValidator, BaseModel, Field, PlainSerializer, TypeAdapter
+from pydantic import AfterValidator, BaseModel, TypeAdapter
 
 PREFIXES = ["var", "condition", "question", "answer"]
 
@@ -32,8 +32,10 @@ type MathProblemFormat = Literal[
 
 class MathProblemModel(BaseModel):
     id: str
-    format: MathProblemFormat = "auto"
     code: MathGenCode
+    format: MathProblemFormat = "auto"
+    units: str = ""
+    rtl: bool = False
 
 
 MathProblemModelAdapter = TypeAdapter(MathProblemModel)
@@ -41,6 +43,8 @@ MathProblemModelAdapter = TypeAdapter(MathProblemModel)
 
 class MathProblem(BaseModel):
     id: str
-    format: MathProblemFormat = "auto"
     question: str = ""
     answer: str = ""
+    format: MathProblemFormat = "auto"
+    units: str = ""
+    rtl: bool = False
