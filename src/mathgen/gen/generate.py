@@ -105,6 +105,9 @@ class MathProblemGenerator:
         if self.problem.format == "auto":
             self.problem.format = recognize_answer_format(self.problem.answer)
 
+    def _gen_group(self, line: str):
+        raise Exception("Group directive not handled by mathgen core")
+
     def _step_current_seed(self):
         if isinstance(self.__current_seed, int):
             self.__current_seed = (

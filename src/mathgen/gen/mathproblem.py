@@ -2,7 +2,7 @@ from typing import Annotated, Any, Dict, Literal, Optional, Tuple
 
 from pydantic import AfterValidator, BaseModel, Field, PlainSerializer, TypeAdapter
 
-PREFIXES = ["var", "condition", "question", "answer"]
+PREFIXES = ["var", "condition", "question", "answer", "group"]
 
 
 def split_prefix(line: str) -> Optional[Tuple[str, str]]:
