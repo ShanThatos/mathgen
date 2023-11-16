@@ -48,10 +48,21 @@ class MathProblemGenerator:
             self.__current_seed = self.seed
             self.vars_list = []
             problems: List[MathProblem] = []
-            for _ in range(n):
-                problems.append(self._generate())
-                self.vars_list.append(self.vars.copy())
+            failures = 0
+            while len(problems) < n:
+                problem = self._generate()
                 self._step_current_seed()
+                if failures < 10:
+                    if self.vars in self.vars_list:
+                        failures += 1
+                        continue
+                    if any(problem.question == p.question and problem.answer == p.answer for p in problems):
+                        failures += 1
+                        continue
+                failures = 0
+                
+                problems.append(problem)
+                self.vars_list.append(self.vars.copy())
             self.__current_seed = self.seed
         return problems
 
