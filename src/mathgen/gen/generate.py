@@ -3,7 +3,13 @@ import threading
 from typing import Dict, List
 
 from ..math.evaluate import evaluate_expression
-from .mathproblem import MathGenCode, MathProblem, MathProblemModel, split_prefix
+from .mathproblem import (
+    MathGenCode,
+    MathProblem,
+    MathProblemFormat,
+    MathProblemModel,
+    split_prefix,
+)
 
 
 class MathProblemGenerator:
@@ -19,7 +25,7 @@ class MathProblemGenerator:
         for _ in range(self.MAX_TRIES):
             self.vars = {}
             self.questions = set()
-            self.problem = MathProblem(id=self.model.id)
+            self.problem = MathProblem(id=self.model.id, format=self.model.format)
             for line in self.model.code.splitlines():
                 line = line.strip()
                 if not line:
@@ -90,9 +96,9 @@ class MathProblemGenerator:
             ) % 1000000007
 
     @classmethod
-    def from_code(cls, code: MathGenCode, *args, **kwargs):
+    def from_code(cls, code: MathGenCode, format: MathProblemFormat="auto", *args, **kwargs):
         return cls(
-            MathProblemModel(id="generated_from_code", code=code), *args, **kwargs
+            MathProblemModel(id="generated_from_code", code=code, format=format), *args, **kwargs
         )
 
 

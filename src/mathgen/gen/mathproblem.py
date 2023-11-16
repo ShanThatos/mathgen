@@ -23,9 +23,14 @@ def mathgen_validator(code: str) -> str:
 
 MathGenCode = Annotated[str, AfterValidator(mathgen_validator)]
 
+type MathProblemFormat = Literal[
+    "auto", "number", "decimal", "money", "fraction", "mixed"
+]
+
 
 class MathProblemModel(BaseModel):
     id: str
+    format: MathProblemFormat = "auto"
     code: MathGenCode
 
 
@@ -34,5 +39,6 @@ MathProblemModelAdapter = TypeAdapter(MathProblemModel)
 
 class MathProblem(BaseModel):
     id: str
+    format: MathProblemFormat = "auto"
     question: str = ""
     answer: str = ""
