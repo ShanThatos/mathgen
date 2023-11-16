@@ -32,6 +32,7 @@ class MathProblemModel(BaseModel):
     id: str
     format: MathProblemFormat = "auto"
     code: MathGenCode
+    units: str = ""
 
 
 MathProblemModelAdapter = TypeAdapter(MathProblemModel)
@@ -42,3 +43,4 @@ class MathProblem(BaseModel):
     format: MathProblemFormat = "auto"
     question: str = ""
     answer: str = ""
+    units: str = ""
