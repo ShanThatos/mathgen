@@ -1,4 +1,5 @@
 import random
+import re
 import threading
 from typing import Dict, List
 
@@ -10,6 +11,19 @@ from .mathproblem import (
     MathProblemModel,
     split_prefix,
 )
+
+ANSWER_FORMATS: Dict[MathProblemFormat, re.Pattern] = {
+    "number": re.compile(r"^\$-?\d+\$$"),
+    "decimal": re.compile(r"^\$-?\d+\.\d+\$$"),
+    "fraction": re.compile(r"^-?\\frac{\d+}{\d+}$"),
+    "mixed": re.compile(r"^-?\d+\\frac{\d+}{\d+}")
+}
+
+def recognize_answer_format(answer: str) -> MathProblemFormat:
+    for format, regex in ANSWER_FORMATS.items():
+        if regex.match(answer):
+            return format
+    raise ValueError(f"Didn't find matching answer format for: {repr(answer)}")
 
 
 class MathProblemGenerator:
@@ -88,6 +102,8 @@ class MathProblemGenerator:
 
     def _gen_answer(self, line: str):
         self.problem.answer = eval(f"f{repr("$" + line.strip() + "$")}", {}, self.vars)
+        if self.problem.format == "auto":
+            self.problem.format = recognize_answer_format(self.problem.answer)
 
     def _step_current_seed(self):
         if isinstance(self.__current_seed, int):
