@@ -80,6 +80,18 @@ class PN:
     def is_improper(self):
         return self.is_fraction and not self.is_proper
 
+    @property
+    def is_repeating(self):
+        num, den = abs(self.num), self.den
+        num %= den
+        digits = set()
+        while num:
+            if num in digits:
+                return True
+            digits.add(num)
+            num = num * 10 % den
+        return False
+
     def __format__(self, spec: str):
         options = None
         if ":" in spec:
