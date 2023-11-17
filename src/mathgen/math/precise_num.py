@@ -129,7 +129,9 @@ class PN:
             digits = "".join(ch for ch in options if ch.isdigit())
             if digits:
                 num_decimals = int(digits)
-            outputs.append(self.as_decimal(num_decimals=num_decimals))
+            outputs.append(
+                self.as_decimal(max_decimals=num_decimals, repeating="r" in options)
+            )
 
         if not outputs:
             raise ValueError(f"invalid format {repr(format)} for {repr(self)}")
@@ -141,9 +143,9 @@ class PN:
 
         return ",".join(distinct_outputs)
 
-    def as_decimal(self, num_decimals: int = 3):
-        if num_decimals < 0:
-            raise ValueError(f"invalid number of decimals {num_decimals}")
+    def as_decimal(self, max_decimals: int = 10, repeating: bool = False):
+        if max_decimals < 0:
+            raise ValueError(f"max_decimals must be >= 0, got {max_decimals}")
 
         if self.num == 0:
             return "0"
@@ -151,7 +153,7 @@ class PN:
         sign = "-" if self.num < 0 else ""
         num, den = abs(self.num), self.den
 
-        if num_decimals == 0:
+        if max_decimals == 0:
             result = num // den + (num % den * 2 >= den)
             if result == 0:
                 return "0"
@@ -163,10 +165,24 @@ class PN:
             num %= den
 
         decimal_index = len(digits)
-        for _ in range(num_decimals):
+        for _ in range(max_decimals):
             num *= 10
-            digits.append(num // den)
+            digit = num // den
+
+            try:
+                if repeating:
+                    index = digits.index(digit, decimal_index)
+                    digits.append("}")
+                    digits.insert(index, r"\overline{")
+                    digits.insert(decimal_index, ".")
+                    digits.insert(0, sign)
+                    return "".join(str(digit) for digit in digits)
+            except ValueError:
+                pass
+            digits.append(digit)
             num %= den
+            if num == 0:
+                break
 
         if num * 2 >= den:
             carry = 1
@@ -189,6 +205,9 @@ class PN:
             digits.pop()
         return "".join(str(digit) for digit in digits)
 
+    def as_repeating_decimal(self):
+        return self.as_decimal(9999, repeating=True)
+
     def __str__(self):
         return self.as_latex()
 
@@ -209,4 +228,5 @@ if __name__ == "__main__":
     # print(eval(repr(PN(5, 3))))
 
     # print((PN(-15) / PN(10)).as_decimal(5))
+    print(PN(1, 7).as_decimal(repeating=True))
     pass
