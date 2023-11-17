@@ -14,7 +14,7 @@ from .mathproblem import (
 
 ANSWER_FORMATS: Dict[MathProblemFormat, re.Pattern] = {
     "number": re.compile(r"^\$-?\d+\$$"),
-    "decimal": re.compile(r"^\$-?\d+\.\d+\$$"),
+    "decimal": re.compile(r"^\$-?\d*\.\d+\$$"),
     "fraction": re.compile(r"^\$-?\\frac{\d+}{\d+}\$$"),
     "mixed": re.compile(r"^\$-?\d+\\frac{\d+}{\d+}\$$")
 }
