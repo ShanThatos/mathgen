@@ -26,7 +26,7 @@ def recognize_answer_format(answer: str) -> MathProblemFormat:
     raise ValueError(f"Didn't find matching answer format for: {repr(answer)}")
 
 QA_GLOBALS = {
-    "blank": r"\underline{\quad}",
+    "blank": r"\underline{\quad\quad}",
     "text": lambda s: rf"\text{{{s}}}"
 }
 
