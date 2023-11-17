@@ -81,13 +81,17 @@ class PN:
         return self.is_fraction and not self.is_proper
 
     def __format__(self, spec: str):
-        return self.as_latex(format=spec)  # type: ignore
+        options = None
+        if ":" in spec:
+            spec, options = spec.split(":", 1)
+        return self.as_latex(format=spec, options=options)  # type: ignore
 
     def as_latex(
         self,
         format: Optional[
             Literal["integer", "fraction", "mixed", "decimal", "all"]
         ] = None,
+        options: Optional[str] = None,
     ):
         if not format:
             format = (
@@ -107,6 +111,14 @@ class PN:
         if self.is_improper and format in ("mixed", "all"):
             outputs.append(rf"{sign}{num // den or " "}\frac{{{num % den}}}{{{den}}}")
 
+        if format == "decimal":
+            num_decimals = 3
+            options = options or ""
+            digits = "".join(ch for ch in options if ch.isdigit())
+            if digits:
+                num_decimals = int(digits)
+            outputs.append(self.as_decimal(num_decimals=num_decimals))
+
         if not outputs:
             raise ValueError(f"invalid format {repr(format)} for {repr(self)}")
 
@@ -116,6 +128,54 @@ class PN:
                 distinct_outputs.append(output)
 
         return ",".join(distinct_outputs)
+
+    def as_decimal(self, num_decimals: int = 3):
+        if num_decimals < 0:
+            raise ValueError(f"invalid number of decimals {num_decimals}")
+
+        if self.num == 0:
+            return "0"
+
+        sign = "-" if self.num < 0 else ""
+        num, den = abs(self.num), self.den
+
+        if num_decimals == 0:
+            result = num // den + (num % den * 2 >= den)
+            if result == 0:
+                return "0"
+            return sign + str(result)
+
+        digits = []
+        if num // den:
+            digits.extend(int(ch) for ch in str(num // den))
+            num %= den
+
+        decimal_index = len(digits)
+        for _ in range(num_decimals):
+            num *= 10
+            digits.append(num // den)
+            num %= den
+
+        if num * 2 >= den:
+            carry = 1
+            i = len(digits) - 1
+            while carry:
+                if i < 0:
+                    digits.insert(0, 0)
+                    decimal_index += 1
+                    i = 0
+                digits[i] += carry
+                carry = digits[i] // 10
+                digits[i] %= 10
+                i -= 1
+
+        digits.insert(decimal_index, ".")
+        digits.insert(0, sign)
+        while digits[-1] == 0:
+            digits.pop()
+        if digits[-1] == ".":
+            digits.pop()
+        return "".join(str(digit) for digit in digits)
 
     def __str__(self):
         return self.as_latex()
@@ -135,4 +195,6 @@ if __name__ == "__main__":
     # print(PN(13) // PN(3))
 
     # print(eval(repr(PN(5, 3))))
+
+    # print((PN(-15) / PN(10)).as_decimal(5))
     pass
