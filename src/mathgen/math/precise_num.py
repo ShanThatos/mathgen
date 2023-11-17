@@ -124,14 +124,14 @@ class PN:
             outputs.append(rf"{sign}{num // den or " "}\frac{{{num % den}}}{{{den}}}")
 
         if format == "decimal":
-            num_decimals = 3
+            kwargs = {}
             options = options or ""
             digits = "".join(ch for ch in options if ch.isdigit())
             if digits:
-                num_decimals = int(digits)
-            outputs.append(
-                self.as_decimal(max_decimals=num_decimals, repeating="r" in options)
-            )
+                kwargs["num_decimal"] = int(digits)
+            if "r" in options:
+                kwargs["repeating"] = True
+            outputs.append(self.as_decimal(**kwargs))
 
         if not outputs:
             raise ValueError(f"invalid format {repr(format)} for {repr(self)}")
