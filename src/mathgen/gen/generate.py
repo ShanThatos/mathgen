@@ -25,6 +25,9 @@ def recognize_answer_format(answer: str) -> MathProblemFormat:
             return format
     raise ValueError(f"Didn't find matching answer format for: {repr(answer)}")
 
+QA_GLOBALS = {
+    "blank": r"\underline{\quad}"
+}
 
 class MathProblemGenerator:
     MAX_TRIES = 50
@@ -98,10 +101,10 @@ class MathProblemGenerator:
         )
 
     def _gen_question(self, line: str):
-        self.questions.add(eval(f"f{repr("$" + line.strip() + "$")}", {}, self.vars))
+        self.questions.add(eval(f"f{repr("$" + line.strip() + "$")}", QA_GLOBALS, self.vars))
 
     def _gen_answer(self, line: str):
-        self.problem.answer = eval(f"f{repr("$" + line.strip() + "$")}", {}, self.vars)
+        self.problem.answer = eval(f"f{repr("$" + line.strip() + "$")}", QA_GLOBALS, self.vars)
         if self.problem.format == "auto":
             self.problem.format = recognize_answer_format(self.problem.answer)
 
