@@ -14,7 +14,7 @@ def split_prefix(line: str) -> Optional[Tuple[str, str]]:
 
 
 def mathgen_validator(code: str) -> str:
-    if code.strip().startswith("@group "):
+    if code.strip().startswith("@group"):
         return code
     lines = (x for x in code.splitlines() if x.strip())
     for line in lines:
